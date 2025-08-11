@@ -1,38 +1,62 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 
-// 創建上下文
 const TripContext = createContext();
 
-// 提供上下文的組件
+// 定義預設字體大小
+const defaultFontSizes = {
+  h2: 24,          // 主要標題 (例如 "我的行程")
+  h4: 18,          // 卡片標題
+  destination: 20, // 卡片中的目的地
+  body: 14,        // 一般內文
+  small: 12,       // 較小文字 (例如航班資訊)
+  label: 14,       // 表單標籤
+};
+
 export const TripProvider = ({ children }) => {
-  // 從localStorage獲取行程數據
+  // --- 原有的行程狀態管理 ---
   const [trips, setTrips] = useState(() => {
     const savedTrips = localStorage.getItem('trips');
     return savedTrips ? JSON.parse(savedTrips) : [];
   });
 
-  // 從localStorage獲取最後選擇的行程ID
   const [selectedTripId, setSelectedTripId] = useState(() => {
     const lastSelectedTrip = localStorage.getItem('lastSelectedTrip');
     return lastSelectedTrip || '';
   });
 
-  // 當選定的行程ID變化時，保存到localStorage
   useEffect(() => {
     localStorage.setItem('lastSelectedTrip', selectedTripId);
   }, [selectedTripId]);
 
-  // 當行程數據變化時，保存到localStorage
   useEffect(() => {
     localStorage.setItem('trips', JSON.stringify(trips));
   }, [trips]);
 
-  // 提供給上下文的值
+  // --- 新增的字體大小狀態管理 ---
+  const [fontSizes, setFontSizes] = useState(() => {
+    try {
+      const savedFontSizes = localStorage.getItem('fontSizes');
+      // 合併儲存的設定與預設值，避免未來新增設定時出錯
+      return savedFontSizes ? { ...defaultFontSizes, ...JSON.parse(savedFontSizes) } : defaultFontSizes;
+    } catch (error) {
+      console.error("Failed to parse font sizes from localStorage", error);
+      return defaultFontSizes;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('fontSizes', JSON.stringify(fontSizes));
+  }, [fontSizes]);
+
+
+  // --- 提供給所有子元件的值 ---
   const value = {
     trips,
     setTrips,
     selectedTripId,
     setSelectedTripId,
+    fontSizes,      // 提供字體大小設定
+    setFontSizes,   // 提供更新字體大小的函式
   };
 
   return <TripContext.Provider value={value}>{children}</TripContext.Provider>;
@@ -42,7 +66,7 @@ export const TripProvider = ({ children }) => {
 export const useTrip = () => {
   const context = useContext(TripContext);
   if (context === undefined) {
-    throw new Error('useTrip必須在TripProvider內使用');
+    throw new Error('useTrip 必須在 TripProvider 內使用');
   }
   return context;
 };

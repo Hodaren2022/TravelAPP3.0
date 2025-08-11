@@ -1,35 +1,51 @@
-import { Routes, Route, NavLink } from 'react-router-dom'
-import styled from 'styled-components'
-import { useState, useEffect } from 'react'
+import { Routes, Route, NavLink } from 'react-router-dom';
+import styled, { createGlobalStyle } from 'styled-components';
+import { useState, useEffect } from 'react';
+import { useTrip, TripProvider } from './contexts/TripContext';
 
 // 頁面組件
-import TripManagement from './pages/TripManagement'
-import DailyItinerary from './pages/DailyItinerary'
-import HotelInfo from './pages/HotelInfo'
-import TravelTips from './pages/TravelTips'
-import PackingList from './pages/PackingList'
-import TravelNotes from './pages/TravelNotes'
-import DataManagement from './pages/DataManagement'
-import ExpenseTracker from './pages/ExpenseTracker'
-import Notes from './pages/Notes'
-import Settings from './pages/Settings'
+import TripManagement from './pages/TripManagement';
+import DailyItinerary from './pages/DailyItinerary';
+import HotelInfo from './pages/HotelInfo';
+import TravelTips from './pages/TravelTips';
+import PackingList from './pages/PackingList';
+import TravelNotes from './pages/TravelNotes';
+import DataManagement from './pages/DataManagement';
+import ExpenseTracker from './pages/ExpenseTracker';
+import Notes from './pages/Notes';
+import Settings from './pages/Settings';
 
-// 上下文提供者
-import { TripProvider } from './contexts/TripContext'
+// --- 新增：全域字體樣式注入器 ---
+const GlobalFontStyles = createGlobalStyle`
+  :root {
+    --font-size-h2: ${props => props.fontSizes.h2}px;
+    --font-size-h4: ${props => props.fontSizes.h4}px;
+    --font-size-destination: ${props => props.fontSizes.destination}px;
+    --font-size-body: ${props => props.fontSizes.body}px;
+    --font-size-small: ${props => props.fontSizes.small}px;
+    --font-size-label: ${props => props.fontSizes.label}px;
+  }
+`;
 
-// 樣式組件
+// 這個輔助元件會從 Context 獲取字體設定，並傳遞給 GlobalFontStyles
+const FontStyleInjector = () => {
+  const { fontSizes } = useTrip();
+  return <GlobalFontStyles fontSizes={fontSizes} />;
+};
+
+// --- 原有的樣式組件 ---
 const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-`
+`;
 
 const Header = styled.header`
   background-color: #2c3e50;
   color: white;
   padding: 1rem;
   text-align: center;
-`
+`;
 
 const MainContent = styled.main`
   flex: 1;
@@ -39,7 +55,7 @@ const MainContent = styled.main`
   @media (max-width: 768px) {
     padding: 0.8rem 0.5rem;
   }
-`
+`;
 
 const Navigation = styled.nav`
   background-color: #34495e;
@@ -59,7 +75,7 @@ const Navigation = styled.nav`
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
   }
-`
+`;
 
 const NavItem = styled(NavLink)`
   color: white;
@@ -86,16 +102,15 @@ const NavItem = styled(NavLink)`
     text-align: center;
     display: block;
   }
-`
+`;
 
 const Footer = styled.footer`
   background-color: #2c3e50;
   color: white;
   text-align: center;
   padding: 1rem;
-`
+`;
 
-// 定義可用頁面列表
 const availablePages = [
   { id: 'tripManagement', name: '行程管理', path: '/', component: TripManagement, default: true },
   { id: 'dailyItinerary', name: '每日行程', path: '/daily', component: DailyItinerary, default: true },
@@ -110,13 +125,11 @@ const availablePages = [
 ];
 
 function App() {
-  // 從localStorage獲取頁面顯示設定
   const [pageSettings, setPageSettings] = useState(() => {
     const savedSettings = localStorage.getItem('pageSettings');
     if (savedSettings) {
       return JSON.parse(savedSettings);
     } else {
-      // 如果沒有保存的設定，使用默認值
       const defaultSettings = {};
       availablePages.forEach(page => {
         defaultSettings[page.id] = page.default;
@@ -125,7 +138,6 @@ function App() {
     }
   });
 
-  // 當localStorage中的設定變更時更新狀態
   useEffect(() => {
     const handleStorageChange = () => {
       const savedSettings = localStorage.getItem('pageSettings');
@@ -140,6 +152,7 @@ function App() {
 
   return (
     <TripProvider>
+      <FontStyleInjector /> {/* 在這裡注入全域字體樣式 */}
       <AppContainer>
         <Header>
           <h1>旅遊應用程序</h1>
@@ -147,7 +160,6 @@ function App() {
         
         <Navigation>
           {availablePages.map(page => (
-            // 根據設定決定是否顯示導航項目
             pageSettings[page.id] && (
               <NavItem key={page.id} to={page.path} end={page.path === '/'}>
                 {page.name}
@@ -169,7 +181,7 @@ function App() {
         </Footer>
       </AppContainer>
     </TripProvider>
-  )
+  );
 }
 
-export default App
+export default App;
