@@ -86,11 +86,14 @@ const FlightTable = styled.table`
 `;
 const ButtonGroup = styled.div` display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end; `;
 const Button = styled.button`
-  background-color: ${props => props.$primary ? '#3498db' : (props.$danger ? '#e74c3c' : '#bdc3c7')};
+  background-color: ${props => props.$fixedBlue ? '#3498db' : (props.$primary ? '#3498db' : (props.$danger ? '#e74c3c' : '#bdc3c7'))};
   color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px;
-  cursor: pointer; font-weight: bold; transition: background-color 0.2s;
+  cursor: pointer; font-weight: bold;
+  transition: ${props => props.$fixedBlue ? 'none' : 'background-color 0.2s'}; /* No transition for fixed blue */
   font-size: var(--font-size-body);
-  &:hover { opacity: 0.9; }
+  &:hover {
+    ${props => props.$fixedBlue ? 'opacity: 1;' : 'opacity: 0.9;'} /* No opacity change for fixed blue */
+  }
 `;
 const ToastBackdrop = styled.div`
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -379,7 +382,7 @@ const TripManagement = () => {
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h2>我的行程</h2>
-          <Button onClick={toggleSortOrder} style={{ padding: '0.5rem 1rem' }}>
+          <Button onClick={toggleSortOrder} style={{ padding: '0.5rem 1rem' }} $fixedBlue>
             {sortOrder === 'desc' ? '排序：新到舊 ↓' : '排序：舊到新 ↑'}
           </Button>
         </div>
