@@ -92,14 +92,28 @@ const Button = styled.button`
   font-size: var(--font-size-body);
   &:hover { opacity: 0.9; }
 `;
+const ToastBackdrop = styled.div`
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Darker background */
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1999; /* Below toast, above other content */
+`;
+
 const Toast = styled.div`
-  position: fixed; top: 20px; right: 20px; background-color: #4CAF50; color: white;
-  padding: 16px; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 2000;
-  animation: fadeIn 0.3s, fadeOut 0.3s 0.7s; opacity: 0; transition: opacity 0.3s;
-  font-size: var(--font-size-body);
-  &.show { opacity: 1; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+  background-color: #4CAF50; color: white;
+  padding: 30px 40px; /* Increased padding for larger text */
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  font-size: 24px; /* Larger text */
+  text-align: center;
+  min-width: 250px; /* Ensure it's not too small */
+
+  &.show {
+    opacity: 1;
+  }
 `;
 const FloatingActionButton = styled.button`
   position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%;
@@ -273,7 +287,7 @@ const TripManagement = () => {
 
   const showToast = (message) => {
     setToast({ show: true, message });
-    setTimeout(() => setToast({ show: false, message: '' }), 1000);
+    setTimeout(() => setToast({ show: false, message: '' }), 1500);
   };
 
   const closeModal = () => {
@@ -342,6 +356,7 @@ const TripManagement = () => {
       showToast('已新增航班');
     }
     setNewTrip(prev => ({ ...prev, flights: sortFlights(updatedFlights) }));
+    showToast('請記得儲存行程後生效');
 
     setIsEditingFlight(false);
     setEditingFlightId(null);
@@ -357,7 +372,11 @@ const TripManagement = () => {
     <>
       <GlobalStyle />
       <Container>
-        {toast.show && <Toast className="show">{toast.message}</Toast>}
+        {toast.show && (
+          <ToastBackdrop>
+            <Toast className="show">{toast.message}</Toast>
+          </ToastBackdrop>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h2>我的行程</h2>
           <Button onClick={toggleSortOrder} style={{ padding: '0.5rem 1rem' }}>
