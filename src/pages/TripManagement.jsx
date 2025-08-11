@@ -42,7 +42,7 @@ const DestinationDisplay = styled.p`
 `;
 const FlightInfoList = styled.div`
   margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;
-  max-height: 150px; overflow-y: auto; color: #333;
+  color: #333; /* Removed max-height and overflow-y */
   font-size: var(--font-size-small);
   h5 { margin-top: 0; margin-bottom: 0.5rem; font-size: calc(var(--font-size-small) + 2px); color: #3498db; }
   p { font-size: var(--font-size-small); }
