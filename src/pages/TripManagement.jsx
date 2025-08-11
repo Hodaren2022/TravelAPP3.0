@@ -382,7 +382,7 @@ const TripManagement = () => {
                       <h5>✈️ 航班資訊</h5>
                       {sortFlights(trip.flights).map(flight => (
                         <FlightEntry key={flight.id}>
-                          <p><strong>{flight.date}</strong> - {flight.flightNumber || 'N/A'}</p>
+                          <p><strong>{flight.date}</strong> - {flight.airline || 'N/A'} {flight.flightNumber || 'N/A'}</p>
                           <p>{flight.departureCity || 'N/A'} ({flight.departureTime || '--:--'}) → {flight.arrivalCity || 'N/A'} ({flight.arrivalTime || '--:--'})</p>
                           <p><i>飛行時間: {flight.duration || 'N/A'}</i></p>
                         </FlightEntry>
